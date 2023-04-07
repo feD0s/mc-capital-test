@@ -104,9 +104,9 @@ async def binance_listener():
                     msg = await ws.recv()
                     # Handle the message with the callback function
                     await handle_binance_message(msg)
-        except ConnectionResetError:
+        except (ConnectionResetError, asyncio.exceptions.TimeoutError) as error:
             # Handle the connection reset error here
-            log.error("Binance: Connection reset by peer.")
+            log.error(f"Binance error: {error}")
             # Increment the retry count
             retry_count += 1
             # Check if the maximum retries is reached
@@ -142,9 +142,9 @@ async def okx_listener():
                     msg = await ws.recv()
                     # Handle the message with the callback function
                     await handle_okx_message(msg)
-        except ConnectionResetError:
+        except (ConnectionResetError, asyncio.exceptions.TimeoutError) as error:
             # Handle the connection reset error here
-            log.error("OKX: Connection reset by peer.")
+            log.error(f"OKX error: {error}")
             # Increment the retry count
             retry_count += 1
             # Check if the maximum retries is reached

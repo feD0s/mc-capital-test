@@ -26,10 +26,10 @@ pip install docker
 
 ### Installing and running
 
-1. git clone
-2. cd /rate_service
+1. git clone https://github.com/feD0s/mc-capital-test.git
+2. cd mc-capital-test
 3. docker build -t rates_service .
-4. docker run -p 3000:3000 rates-service
+4. docker run -p 3000:3000 rates_service
 5. open http://localhost:3000/courses in browser
 
 ## Running the tests
@@ -39,7 +39,11 @@ locust must be installed
 pip install locust
 ```
 
-1. cd /rate_service
+In separate terminal window:
+1. cd mc-capital-test
 2. type "locust" in terminal
 3. open http://localhost:8089/ in browser
-4. set number of users and spawn rate, host: http://localhost:3000/, start swarming
+4. example: set number of users: 100 and spawn rate: 10, host: http://localhost:3000/, start swarming
+
+## Screenshots
+![Alt text](stress_testing.jpg?raw=true "Stress testing")
