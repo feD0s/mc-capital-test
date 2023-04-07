@@ -1,0 +1,6 @@
+SYMBOLS: ['BTC-USDT', 'ETH-USDT', 'XRP-USDT']
+EXCHANGES: ['OKX', 'Binance']
+WS_URLS : {
+    'OKX': 'wss://ws.okx.com:8443/ws/v5/public',
+    'Binance': 'wss://stream.binance.com:9443/ws'
+}
