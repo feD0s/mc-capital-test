@@ -24,7 +24,7 @@ EXCHANGES = cfg['EXCHANGES']
 WS_URLS = cfg['WS_URLS']
 
 # A local dictionary to store the rates for each exchange and symbol
-rates = {}
+rates_dict = {}
 # A local dictionary to store rates which are to be returned to the client
 rates_result = {}
 
@@ -36,18 +36,22 @@ lock = asyncio.Lock()
 async def update_rates_dict(symbol, rate, timestamp, exchange):
     # Acquire the lock
     async with lock:
-        # Check if the symbol is already in the dictionary
-        if symbol in rates:
-            # If the symbol is in the dictionary, update the rate
-            rates[symbol][exchange] = {'rate': rate, 'timestamp': timestamp}
-        else:
-            # If the symbol is not in the dictionary, add it
-            rates[symbol] = {
-                exchange: {
-                    'rate': rate,
-                    'timestamp': timestamp
+        try:
+            # Check if the symbol is already in the dictionary
+            if symbol in rates_dict:
+                # If the symbol is in the dictionary, update the rate
+                rates_dict[symbol][exchange] = {'rate': rate, 'timestamp': timestamp}
+            else:
+                # If the symbol is not in the dictionary, add it
+                rates_dict[symbol] = {
+                    exchange: {
+                        'rate': rate,
+                        'timestamp': timestamp
+                    }
                 }
-            }
+        except (KeyError, ValueError) as e:
+            # Handle any exceptions that might occur
+            log.error(f'Error updating {symbol}_{exchange}: {e}')
     # Log the event - commented not to spam the console
     # log.info(f'Updated {symbol} rate from {exchange}: {rate}')
 
@@ -160,7 +164,7 @@ async def okx_listener():
 
 
 # Define a function to update the rates_result dictionary every 5 seconds
-async def update_rates():
+async def update_rates_result():
     # Loop indefinitely
     while True:
         await asyncio.sleep(5)
@@ -173,7 +177,7 @@ async def update_rates():
             for exchange in EXCHANGES:
                 # Get the rate and timestamp from the rates dictionary
                 async with lock:
-                    rate_info = rates.get(symbol, {}).get(exchange, {})
+                    rate_info = rates_dict.get(symbol, {}).get(exchange, {})
                 rate = rate_info.get('rate', None)
                 timestamp = rate_info.get('timestamp', None)
                 time_passed = (
@@ -182,7 +186,7 @@ async def update_rates():
                 if (rate is not None) and (time_passed is not None) and (time_passed < 5):
                     # Update the rates_result dictionary with the latest rate
                     async with lock:
-                        rates_result[symbol] = rates[symbol][exchange]['rate']
+                        rates_result[symbol] = rates_dict[symbol][exchange]['rate']
                     # Use this exchange rate as the final rate and break the loop
                     log.info(f'Using {exchange} rate for {symbol}: {rate}')
                     break
@@ -239,7 +243,7 @@ async def main():
     await asyncio.gather(
         binance_listener(),
         okx_listener(),
-        update_rates(),
+        update_rates_result(),
         web_app()
     )
 
