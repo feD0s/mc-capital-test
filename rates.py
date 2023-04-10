@@ -93,7 +93,7 @@ async def binance_listener():
     retry_count = 0
     # Connect to the websocket
     # Loop until the connection is successful or the maximum retries is reached
-    while True: 
+    while True:
         try:
             async with websockets.connect(url) as ws:
                 # Reset the retry count if the connection is successful
@@ -114,7 +114,8 @@ async def binance_listener():
                 log.error("Binance: Maximum retries reached. Exiting.")
                 break
             else:
-                log.error(f"Binance: Retrying connection in 5 seconds. Attempt {retry_count} of {max_retries}.")
+                log.error(
+                    f"Binance: Retrying connection in 5 seconds. Attempt {retry_count} of {max_retries}.")
                 # Wait for 5 seconds before retrying
                 await asyncio.sleep(5)
 
@@ -130,7 +131,7 @@ async def okx_listener():
     retry_count = 0
     # Connect to the websocket
     # Loop until the connection is successful or the maximum retries is reached
-    while True: 
+    while True:
         try:
             async with websockets.connect(url) as ws:
                 # Send a subscribe request to join the channels
@@ -152,7 +153,8 @@ async def okx_listener():
                 log.error("OKX: Maximum retries reached. Exiting.")
                 break
             else:
-                log.error(f"OKX: Retrying connection in 5 seconds. Attempt {retry_count} of {max_retries}.")
+                log.error(
+                    f"OKX: Retrying connection in 5 seconds. Attempt {retry_count} of {max_retries}.")
                 # Wait for 5 seconds before retrying
                 await asyncio.sleep(5)
 
@@ -226,13 +228,21 @@ async def handle_rates(request):
     # Acquire the lock and get the rates from the dictionary
     async with lock:
         # get rates for the pair name from the request_result dictionary
-        response = {request.match_info['pair_name']: rates_result.get(request.match_info['pair_name'].replace("-",""), None)}
+        response = {request.match_info['pair_name']: rates_result.get(
+            request.match_info['pair_name'].replace("-", ""), None)}
     log.info(f'Sent response: {response}')
     return web.json_response(response)
 
 
-# Get the current event loop
-loop = asyncio.get_event_loop()
-# Run both async functions using asyncio.gather() until they are complete
-loop.run_until_complete(asyncio.gather(
-    binance_listener(), okx_listener(), update_rates(), web_app()))
+# Define a function to schedule awaitables *concurrently*:
+async def main():
+    await asyncio.gather(
+        binance_listener(),
+        okx_listener(),
+        update_rates(),
+        web_app()
+    )
+
+
+# Run the main function
+asyncio.run(main())
