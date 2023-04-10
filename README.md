@@ -2,8 +2,6 @@
 
 A service through which you can receive rates for cryptocurrency pairs from the exchange. The service returns rates for the following pairs: BTC-USDT ETH-USDT XRP-USDT
 
-## Requirements:
-
  - The service can process up to 1500 requests per second
  - Rates are updated every 5 seconds
  - The service is fail-safe (if one of the exchanges stops returning rates, the service switches to another)
