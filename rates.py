@@ -170,14 +170,17 @@ async def update_rates():
             # Iterate over the exchanges
             for exchange in EXCHANGES:
                 # Get the rate and timestamp from the rates dictionary
-                rate_info = rates.get(symbol, {}).get(exchange, {})
+                async with lock:
+                    rate_info = rates.get(symbol, {}).get(exchange, {})
                 rate = rate_info.get('rate', None)
                 timestamp = rate_info.get('timestamp', None)
                 time_passed = (
                     now - timestamp).total_seconds() if timestamp != None else None
                 # Check if the rate is not None and if the timestamp is less than 5 seconds old
                 if (rate is not None) and (time_passed is not None) and (time_passed < 5):
-                    rates_result[symbol] = rates[symbol][exchange]['rate']
+                    # Update the rates_result dictionary with the latest rate
+                    async with lock:
+                        rates_result[symbol] = rates[symbol][exchange]['rate']
                     # Use this exchange rate as the final rate and break the loop
                     log.info(f'Using {exchange} rate for {symbol}: {rate}')
                     break
