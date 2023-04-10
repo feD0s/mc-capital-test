@@ -1,18 +1,20 @@
-# Service for recieving currency rates
+# Service for recieving cryptocurrency rates
 
-Cервис, через который можно получать курсы валютных пар с биржи. Необходимо, чтобы сервис возвращал курсы по следующим валютным парам: BTC-USDT ETH-USDT XRP-USDT 
-Требования: 
-- Сервис может обработать до 1500 запросов в ед. времени 
-- Курсы обновляются раз в 5 секунд 
-- Сервис работает отказаустойчиво (если одна из бирж перестаёт возвращать курсы, то сервис переключается на другой) 
-- В сервисе необходимо реализовать логирование 
-- Курсы необходимо получать из OKX и Binance (приоритет отдаётся OKX) 
-- Работа с биржей происходит по websocket’ам 
-- Нагрузочное тестирование реализовать через locust 
+A service through which you can receive rates for cryptocurrency pairs from the exchange. The service returns rates for the following pairs: BTC-USDT ETH-USDT XRP-USDT
 
-Интерфейс сервиса: 
-ip:port/courses - получить курсы всех валютных пар (списком) 
-ip:port/{pair_name:str} - получить курс определенной валютной пары
+## Requirements:
+
+ - The service can process up to 1500 requests per second
+ - Rates are updated every 5 seconds
+ - The service is fail-safe (if one of the exchanges stops returning rates, the service switches to another)
+ - Logging is implemented
+ - Rates are gathered from OKX and Binance (priority given to OKX)
+ - Websockets are used to communicate with the exchanges
+ - Stress testing is implemented (locust)
+
+ - Service interface:
+     -  ip:port/courses - get the rates of all currency pairs
+     -  ip:port/{pair_name:str} - get the rate of a certain currency pair
 
 
 ## Getting Started
